@@ -1,9 +1,9 @@
 # PoSh
 
-Single::
+Single:
 powershell -command "& {&'some-command' someParam}"
 
-Multiple::
+Multiple:
 powershell -command "& {&'some-command' someParam}"; "& {&'some-command' -SpecificArg someParam}"
 powershell -command "& {$someVar = 'test'; &'Write-Host' $someVar}"
 
