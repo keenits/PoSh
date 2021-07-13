@@ -9,18 +9,15 @@ $EncryptionLevel = 'Required'
 $RememberCredential = $false
 $SplitTunnel = $true
 
-#Cleanup previous VPN Connection
-  $CurrentUser = Get-VpnConnection | Where-Object {$_.name -eq $ConnectionName} | Remove-VpnConnection -force
-  $AllUsers = Get-VpnConnection | Where-Object {$_.name -eq $ConnectionName} | Remove-VpnConnection -AllUserConnection -force
- 
- Try {
-    
+Write-Output "Removing up previous profiles..."
+  Get-VpnConnection | Where-Object {$_.name -eq $ConnectionName} | Remove-VpnConnection -force
+  Get-VpnConnection -AllUserConnection | Where-Object {$_.name -eq $ConnectionName} | Remove-VpnConnection -force
 
-#Create VPN Connections
+Write-Output "Creating VPN profile..."
   Add-VpnConnection -Name $ConnectionName -ServerAddress $ServerAddress -TunnelType $TunnelType -EncryptionLevel Optional -AuthenticationMethod $AuthMethod -AllUserConnection -SplitTunneling -L2tpPsk $PresharedKey -Force -RememberCredential $RememberCredential -DnsSuffix $DNSSuffix -IdleDisconnectSeconds $IdleDisconnect
   Start-Sleep -Milliseconds 100
 
-#Set Additional Settings
+Write-Output "Adding the IP route..."
   Add-VpnConnectionRoute -ConnectionName $ConnectionName -DestinationPrefix $Destination -RouteMetric 1 -AllUserConnection
 
 
