@@ -106,26 +106,27 @@ $ErrorActionPreference = 'SilentlyContinue'
         New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds" -Name "EnableFeeds" -PropertyType DWord -Value 0 -Force | Out-Null
     }
 
-Write-Output "Essential Tweaks Completed"
+    Write-Output "Essential Tweaks Completed"
 
-Write-Output "Hovens Tweaks Started"
+#Hovens tweaks
+    Write-Output "Hovens Tweaks Started"
 
-Write-Output "Setting TimeZone..."
+    Write-Output "Setting TimeZone..."
     Set-TimeZone -Name "Pacific Standard Time"
 
-Write-Output "Disabling first logon privacy settings..."
+    Write-Output "Disabling first logon privacy settings..."
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OOBE" /v "DisablePrivacyExperience" /t REG_DWORD /d 1 /f
 
-Write-Output "Disabling first logon animation..."
+    Write-Output "Disabling first logon animation..."
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableFirstLogonAnimation" /t REG_DWORD /d 0 /f
 
-Write-Output "Renaming system drive..."
+    Write-Output "Renaming system drive..."
     Set-Volume -DriveLetter C -NewFileSystemLabel "Windows"
 
-Write-Output "Disabling IPv6..."
+    Write-Output "Disabling IPv6..."
     Disable-NetAdapterBinding -InterfaceAlias (Get-NetAdapterBinding).Name -ComponentID ms_tcpip6
 
-Write-Output "Disabling LMHOSTS Lookup..."
+    Write-Output "Disabling LMHOSTS Lookup..."
     Set-ItemProperty -path "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters" EnableLMHOSTS -value 0
 
 #Function - Force NetBIOS over TCP/IP
@@ -137,8 +138,57 @@ Write-Output "Disabling LMHOSTS Lookup..."
 #Function - Set CD/DVD Drive to X:
     Function ReletterDrive {Get-WmiObject -Class Win32_volume -Filter 'DriveType=5' | Select-Object -First 1 | Set-WmiInstance -Arguments @{DriveLetter='X:'}}
 
-Write-Output "Executing function calls..."
+    Write-Output "Executing function calls..."
     SetTCPIP | Out-Null
     ReletterDrive | Out-Null
 
-Write-Output "Hovens Tweaks Completed"
+    Write-Output "Hovens Tweaks Completed"
+
+#Disable Cortana
+    Write-Output "Disabling Cortana..."
+    If (!(Test-Path "HKCU:\SOFTWARE\Microsoft\Personalization\Settings")) {
+        New-Item -Path "HKCU:\SOFTWARE\Microsoft\Personalization\Settings" -Force | Out-Null
+    }
+    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Personalization\Settings" -Name "AcceptedPrivacyPolicy" -Type DWord -Value 0
+    If (!(Test-Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization")) {
+        New-Item -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -Force | Out-Null
+    }
+    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -Name "RestrictImplicitTextCollection" -Type DWord -Value 1
+    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -Name "RestrictImplicitInkCollection" -Type DWord -Value 1
+    If (!(Test-Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore")) {
+        New-Item -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore" -Force | Out-Null
+    }
+    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore" -Name "HarvestContacts" -Type DWord -Value 0
+    If (!(Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search")) {
+        New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Force | Out-Null
+    }
+    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCortana" -Type DWord -Value 0
+    Write-Output "Disabled Cortana"
+
+#Disable OneDrive
+    Write-Output "Disabling OneDrive..."
+    If (!(Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive")) {
+        New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" | Out-Null
+    }
+    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" -Name "DisableFileSyncNGSC" -Type DWord -Value 1
+    Write-Output "Uninstalling OneDrive..."
+    Stop-Process -Name "OneDrive" -ErrorAction SilentlyContinue
+    Start-Sleep -s 2
+    $onedrive = "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe"
+    If (!(Test-Path $onedrive)) {
+        $onedrive = "$env:SYSTEMROOT\System32\OneDriveSetup.exe"
+    }
+    Start-Process $onedrive "/uninstall" -NoNewWindow -Wait
+    Start-Sleep -s 2
+    Stop-Process -Name "explorer" -ErrorAction SilentlyContinue
+    Start-Sleep -s 2
+    Remove-Item -Path "$env:USERPROFILE\OneDrive" -Force -Recurse -ErrorAction SilentlyContinue
+    Remove-Item -Path "$env:LOCALAPPDATA\Microsoft\OneDrive" -Force -Recurse -ErrorAction SilentlyContinue
+    Remove-Item -Path "$env:PROGRAMDATA\Microsoft OneDrive" -Force -Recurse -ErrorAction SilentlyContinue
+    Remove-Item -Path "$env:SYSTEMDRIVE\OneDriveTemp" -Force -Recurse -ErrorAction SilentlyContinue
+    If (!(Test-Path "HKCR:")) {
+        New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT | Out-Null
+    }
+    Remove-Item -Path "HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -Recurse -ErrorAction SilentlyContinue
+    Remove-Item -Path "HKCR:\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -Recurse -ErrorAction SilentlyContinue
+    Write-Output "Disabled OneDrive"
