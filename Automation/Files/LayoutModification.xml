@@ -14,7 +14,7 @@
       <taskbar:TaskbarPinList>
         <taskbar:DesktopApp DesktopApplicationLinkPath="%APPDATA%\Microsoft\Windows\Start Menu\Programs\System Tools\File Explorer.lnk" />
         <taskbar:UWA AppUserModelID="Microsoft.MicrosoftEdge_8wekyb3d8bbwe!MicrosoftEdge" />
-        <taskbar:UWA AppUserModelID="%ProgramData%\Microsoft\Windows\Start Menu\Programs\Google Chrome.lnk"
+        <taskbar:UWA AppUserModelID="%ProgramData%\Microsoft\Windows\Start Menu\Programs\Google Chrome.lnk" />
         <taskbar:UWA AppUserModelID="Microsoft.Office.Word_8wekyb3d8bbwe!microsoft.word" />
       </taskbar:TaskbarPinList>
     </defaultlayout:TaskbarLayout>
