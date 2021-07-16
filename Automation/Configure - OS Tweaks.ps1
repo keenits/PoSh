@@ -1,30 +1,6 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
-Write-Host "Creating Restore Point incase something bad happens"
-Enable-ComputerRestore -Drive "C:\"
-Checkpoint-Computer -Description "RestorePoint1" -RestorePointType "MODIFY_SETTINGS"
-
-#Instal Microsoft Desktop App Installer
-    Write-Output "Checking winget..."
-    Try{
-	    # Check if winget is already installed
-	    $er = (invoke-expression "winget -v") 2>&1
-	    if ($lastexitcode) {throw $er}
-	    Write-Output "winget is already installed."
-    }
-    Catch{
-	    # winget is not installed. Install it from the Github release
-	    Write-Output "winget is not found, installing it right now."
-	
-	    $download = "https://github.com/microsoft/winget-cli/releases/download/v1.0.11692/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
-	    $output = $PSScriptRoot + "\winget-latest.appxbundle"
-	    Write-Output "Dowloading latest release"
-	    Invoke-RestMethod -Uri $download -OutFile $output
-	
-	    Write-Output "Installing the package"
-	    Add-AppxPackage -Path $output
-    }Write-Output "Essenital Tweaks Started"
-
+Write-Output "Essenital Tweaks Started"
 #Essential Tweaks
     Write-Output "Disabling Telemetry..."
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
@@ -144,7 +120,7 @@ Checkpoint-Computer -Description "RestorePoint1" -RestorePointType "MODIFY_SETTI
     Write-Output "Disabling LMHOSTS Lookup..."
     Set-ItemProperty -path "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters" EnableLMHOSTS -value 0
 
-    Write-Output Configuring default app associations..."
+    Write-Output "Configuring default app associations..."
     $download = "https://github.com/keenits/PoSh/blob/a4338ca848e114e9b40cca9486a1ec662dfd1706/Automation/Files/defaultassociations.xml"
     $output = "C:\Windows\System32\defaultassociations.xml"
     Invoke-RestMethod -Uri $download -OutFile $output
@@ -162,54 +138,5 @@ Checkpoint-Computer -Description "RestorePoint1" -RestorePointType "MODIFY_SETTI
     Write-Output "Executing function calls..."
     SetTCPIP | Out-Null
     ReletterDrive | Out-Null
-
+    
     Write-Output "Hovens Tweaks Completed"
-
-#Disable Cortana
-    Write-Output "Disabling Cortana..."
-    If (!(Test-Path "HKCU:\SOFTWARE\Microsoft\Personalization\Settings")) {
-        New-Item -Path "HKCU:\SOFTWARE\Microsoft\Personalization\Settings" -Force | Out-Null
-    }
-    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Personalization\Settings" -Name "AcceptedPrivacyPolicy" -Type DWord -Value 0
-    If (!(Test-Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization")) {
-        New-Item -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -Force | Out-Null
-    }
-    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -Name "RestrictImplicitTextCollection" -Type DWord -Value 1
-    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -Name "RestrictImplicitInkCollection" -Type DWord -Value 1
-    If (!(Test-Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore")) {
-        New-Item -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore" -Force | Out-Null
-    }
-    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore" -Name "HarvestContacts" -Type DWord -Value 0
-    If (!(Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search")) {
-        New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Force | Out-Null
-    }
-    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCortana" -Type DWord -Value 0
-    Write-Output "Disabled Cortana"
-
-#Disable OneDrive
-    Write-Output "Disabling OneDrive..."
-    If (!(Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive")) {
-        New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" | Out-Null
-    }
-    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" -Name "DisableFileSyncNGSC" -Type DWord -Value 1
-    Write-Output "Uninstalling OneDrive..."
-    Stop-Process -Name "OneDrive" -ErrorAction SilentlyContinue
-    Start-Sleep -s 2
-    $onedrive = "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe"
-    If (!(Test-Path $onedrive)) {
-        $onedrive = "$env:SYSTEMROOT\System32\OneDriveSetup.exe"
-    }
-    Start-Process $onedrive "/uninstall" -NoNewWindow -Wait
-    Start-Sleep -s 2
-    Stop-Process -Name "explorer" -ErrorAction SilentlyContinue
-    Start-Sleep -s 2
-    Remove-Item -Path "$env:USERPROFILE\OneDrive" -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path "$env:LOCALAPPDATA\Microsoft\OneDrive" -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path "$env:PROGRAMDATA\Microsoft OneDrive" -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path "$env:SYSTEMDRIVE\OneDriveTemp" -Force -Recurse -ErrorAction SilentlyContinue
-    If (!(Test-Path "HKCR:")) {
-        New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT | Out-Null
-    }
-    Remove-Item -Path "HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path "HKCR:\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -Recurse -ErrorAction SilentlyContinue
-    Write-Output "Disabled OneDrive"
