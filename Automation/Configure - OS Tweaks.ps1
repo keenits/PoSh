@@ -1,5 +1,9 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
+Write-Host "Creating Restore Point incase something bad happens"
+Enable-ComputerRestore -Drive "C:\"
+Checkpoint-Computer -Description "RestorePoint1" -RestorePointType "MODIFY_SETTINGS"
+
 #Instal Microsoft Desktop App Installer
     Write-Output "Checking winget..."
     Try{
@@ -111,14 +115,25 @@ $ErrorActionPreference = 'SilentlyContinue'
 #Hovens tweaks
     Write-Output "Hovens Tweaks Started"
 
+    Write-Output "Configuring Edge settings..."
+    reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v CreateDesktopShortcutDefault /t REG_DWORD /d 0 /f | Out-Null
+    reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge\Main" /v PreventFirstRunPage /t REG_DWORD /d 1 /f | Out-Null
+    reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge\Main" /v AllowPrelaunch /t REG_DWORD /d 0 /f | Out-Null
+    reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge\TabPreloader" /v PreventTabPreloading /t REG_DWORD /d 1 /f | Out-Null
+    reg add "HKLM\SOFTWARE\Microsoft\Edge" /v HideFirstRunExperience /t REG_DWORD /d 1 /f | Out-Null
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v DisableEdgeDesktopShortcutCreation /t REG_DWORD /d 1 /f | Out-Null
+
     Write-Output "Setting TimeZone..."
     Set-TimeZone -Name "Pacific Standard Time"
 
     Write-Output "Disabling first logon privacy settings..."
-    reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OOBE" /v "DisablePrivacyExperience" /t REG_DWORD /d 1 /f
+    reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OOBE" /v DisablePrivacyExperience /t REG_DWORD /d 1 /f | Out-Null
 
     Write-Output "Disabling first logon animation..."
-    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableFirstLogonAnimation" /t REG_DWORD /d 0 /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableFirstLogonAnimation /t REG_DWORD /d 0 /f | Out-Null
+
+    Write-Output "Disabling recently added apps on start menu..."
+    reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v HideRecentlyAddedApps /t REG_DWORD /d 1 /f | Out-Null
 
     Write-Output "Renaming system drive..."
     Set-Volume -DriveLetter C -NewFileSystemLabel "Windows"
@@ -128,6 +143,12 @@ $ErrorActionPreference = 'SilentlyContinue'
 
     Write-Output "Disabling LMHOSTS Lookup..."
     Set-ItemProperty -path "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters" EnableLMHOSTS -value 0
+
+    Write-Output Configuring default app associations..."
+    $download = "https://github.com/keenits/PoSh/blob/a4338ca848e114e9b40cca9486a1ec662dfd1706/Automation/Files/defaultassociations.xml"
+    $output = "C:\Windows\System32\defaultassociations.xml"
+    Invoke-RestMethod -Uri $download -OutFile $output
+    Dism /online /import-defaultappassociations:C:\Windows\System32\defaultassociations.xml
 
 #Function - Force NetBIOS over TCP/IP
     Function SetTCPIP {$adapters=(gwmi win32_networkadapterconfiguration )
