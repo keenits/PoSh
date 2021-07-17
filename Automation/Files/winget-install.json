@@ -8,17 +8,21 @@
 			[
 
 				{
-					"PackageIdentifier" : "Notepad++.Notepad++"
+					"PackageIdentifier" : "7zip.7zip"
 				},
 				{
-					"PackageIdentifier" : "Microsoft.Office"
+					"PackageIdentifier" : "Notepad++.Notepad++"
 				},
 				{
 					"PackageIdentifier" : "Adobe.AdobeAcrobatReaderDC"
 				},
 				{
 					"PackageIdentifier" : "Google.Chrome"
+				},
+				{
+					"PackageIdentifier" : "Microsoft.Office"
 				}
+
 			],
 			"SourceDetails" : 
 			{
