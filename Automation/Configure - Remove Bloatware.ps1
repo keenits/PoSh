@@ -39,6 +39,6 @@ Write-Output "Removing AppxPackages"
     "*XboxSpeech*",
     "*ZuneVideo",
     "*ZuneMusic")
-    $aRemoveBuiltinApps|%{Get-AppxPackage -AllUser $_ | Remove-AppxPackage | Remove-AppxProvisionedPackage -Online | Out-Null }
+    $aRemoveBuiltinApps|%{Get-AppxPackage -AllUsers $_ | Remove-AppxPackage | Remove-AppxProvisionedPackage -Online | Out-Null }
 
 Write-Output "Done removing AppxPackages"
