@@ -92,5 +92,4 @@ else
 	
 	write-host -ForegroundColor green "Backup complete!"
 	
-} 
-Comments
+}
