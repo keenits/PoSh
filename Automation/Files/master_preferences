@@ -1,29 +1,17 @@
 {
-  "homepage": "http://www.google.com",
-  "homepage_is_newtabpage": false,
-  "browser": {
-  "show_home_button": true
-},
-  "session": {
-  "restore_on_startup": 4,
-  "startup_urls": [
-    "http://www.google.com/ig"
-  ]
-},
-  "distribution":{
-  "msi":true,
-  "system_level":true,
-  "verbose_logging":true,
-  "allow_downgrade":false,
-  "skip_first_run_ui": true,
-  "show_welcome_page": false,
-  "import_search_engine": false,
-  "import_history": false,
-  "do_not_create_any_shortcuts" : true,
-  "do_not_create_desktop_shortcut" :true,
+  "distribution": {
+  "allow_downgrade": false,
   "create_all_shortcuts": false,
+  "do_not_create_any_shortcuts": true,
+  "do_not_create_desktop_shortcut": true,
   "do_not_launch_chrome": true,
+  "import_history": false,
+  "import_search_engine": false,
   "make_chrome_default": true,
-  "suppress_first_run_default_browser_prompt": true,    
-  "system_level": true}
+  "msi": true,
+  "show_welcome_page": false,
+  "skip_first_run_ui": true,
+  "suppress_first_run_default_browser_prompt": true,
+  "system_level": true
+  "verbose_logging":true,}
 }
