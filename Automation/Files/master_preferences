@@ -12,6 +12,7 @@
   "show_welcome_page": false,
   "skip_first_run_ui": true,
   "suppress_first_run_default_browser_prompt": true,
-  "system_level": true
-  "verbose_logging":true,}
+  "system_level": true,
+  "verbose_logging":true
+  }
 }
