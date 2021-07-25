@@ -41,7 +41,7 @@ function Delete-ComputerRestorePoints{
 	}
 }
 
-Write-Host "Deleting System Restore Points"
+Write-Output "Deleting System Restore Points"
 	Get-ComputerRestorePoint | Delete-ComputerRestorePoints # -WhatIf
 
 #	Write-host "Checking to make sure you have Local Admin rights" -foreground yellow
@@ -52,20 +52,20 @@ Write-Host "Deleting System Restore Points"
 #        Exit 1
 #    }
 
-Write-Host "Capturing current free disk space on Drive C" -foreground yellow
+Write-Output "Capturing current free disk space on Drive C" -foreground yellow
     $FreespaceBefore = (Get-WmiObject win32_logicaldisk -filter "DeviceID='C:'" | select Freespace).FreeSpace/1GB
 
-Write-host "Deleting Rouge folders" -foreground yellow
+Write-Output "Deleting Rouge folders" -foreground yellow
     if (test-path C:\Config.Msi) {remove-item -Path C:\Config.Msi -force -recurse}
 	if (test-path c:\Intel) {remove-item -Path c:\Intel -force -recurse}
 	if (test-path c:\PerfLogs) {remove-item -Path c:\PerfLogs -force -recurse}
 	# if (test-path c:\swsetup) {remove-item -Path c:\swsetup -force -recurse} # HP Software and Driver Repositry
     if (test-path $env:windir\memory.dmp) {remove-item $env:windir\memory.dmp -force}
 
-Write-host "Deleting Windows Error Reporting files" -foreground yellow
+Write-Output "Deleting Windows Error Reporting files" -foreground yellow
     if (test-path C:\ProgramData\Microsoft\Windows\WER) {Get-ChildItem -Path C:\ProgramData\Microsoft\Windows\WER -Recurse | Remove-Item -force -recurse}
 
-Write-host "Removing System and User Temp Files" -foreground yellow
+Write-Output "Removing System and User Temp Files" -foreground yellow
     Remove-Item -Path "$env:windir\Temp\*" -Force -Recurse
     Remove-Item -Path "$env:windir\minidump\*" -Force -Recurse
     Remove-Item -Path "$env:windir\Prefetch\*" -Force -Recurse
@@ -77,17 +77,17 @@ Write-host "Removing System and User Temp Files" -foreground yellow
     Remove-Item -Path "C:\Users\*\AppData\Local\Microsoft\Windows\IEDownloadHistory\*" -Force -Recurse
     Remove-Item -Path "C:\Users\*\AppData\Local\Microsoft\Windows\INetCache\*" -Force -Recurse
     Remove-Item -Path "C:\Users\*\AppData\Local\Microsoft\Windows\INetCookies\*" -Force -Recurse
-	Remove-Item -Path "C:\Users\*\AppData\Local\Microsoft\Terminal Server Client\Cache\*" -Force -Recurse
+    Remove-Item -Path "C:\Users\*\AppData\Local\Microsoft\Terminal Server Client\Cache\*" -Force -Recurse
 
-Write-host "Removing Windows Updates Downloads" -foreground yellow
+Write-Output "Removing Windows Updates Downloads" -foreground yellow
     Stop-Service wuauserv -Force -Verbose
-	Stop-Service TrustedInstaller -Force -Verbose
+    Stop-Service TrustedInstaller -Force -Verbose
     Remove-Item -Path "$env:windir\SoftwareDistribution\*" -Force -Recurse
     Remove-Item $env:windir\Logs\CBS\* -force -recurse
     Start-Service wuauserv -Verbose
-	Start-Service TrustedInstaller -Verbose
+    Start-Service TrustedInstaller -Verbose
 
-Write-host "Checkif Windows Cleanup exists" -foreground yellow
+Write-Output "Checkif Windows Cleanup exists" -foreground yellow
 #Mainly for 2008 servers
 	if (!(Test-Path c:\windows\System32\cleanmgr.exe)) {
 	Write-host "Windows Cleanup NOT installed now installing" -foreground yellow
@@ -96,7 +96,7 @@ Write-host "Checkif Windows Cleanup exists" -foreground yellow
 	}
 
 
-Write-host "Running Windows System Cleanup" -foreground yellow
+Write-Output "Running Windows System Cleanup" -foreground yellow
 #Set StateFlags setting for each item in Windows disk cleanup utility
 $StateFlags = 'StateFlags0013'
 $StateRun = $StateFlags.Substring($StateFlags.get_Length()-2)
@@ -131,13 +131,13 @@ $StateRun = '/sagerun:' + $StateRun
 		set-itemproperty -path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Windows Upgrade Log Files' -name $StateFlags -type DWORD -Value 2
     }
 
-Write-host "Starting CleanMgr.exe.." -foreground yellow
+Write-Output "Starting CleanMgr.exe.." -foreground yellow
     Start-Process -FilePath CleanMgr.exe -ArgumentList $StateRun  -WindowStyle Hidden -Wait
 
-Write-host "Clearing All Event Logs" -foreground yellow
+Write-Output "Clearing All Event Logs" -foreground yellow
     wevtutil el | Foreach-Object {Write-Host "Clearing $_"; wevtutil cl "$_"}
 
-Write-host "Disk Usage before and after cleanup" -foreground yellow
+Write-Output "Disk Usage before and after cleanup" -foreground yellow
     $FreespaceAfter = (Get-WmiObject win32_logicaldisk -filter "DeviceID='C:'" | select Freespace).FreeSpace/1GB
     "Free Space Before: {0}" -f $FreespaceBefore
     "Free Space After: {0}" -f $FreespaceAfter
