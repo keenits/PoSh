@@ -44,15 +44,15 @@ function Delete-ComputerRestorePoints{
 Write-Host "Deleting System Restore Points"
 	Get-ComputerRestorePoint | Delete-ComputerRestorePoints # -WhatIf
 
-	Write-host "Checking to make sure you have Local Admin rights" -foreground yellow
-    If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
-    {
-        Write-Warning "Please run this script as an Administrator!"
-        If (!($psISE)){"Press any key to continue…";[void][System.Console]::ReadKey($true)}
-        Exit 1
-    }
+#	Write-host "Checking to make sure you have Local Admin rights" -foreground yellow
+#    If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
+#    {
+#        Write-Warning "Please run this script as an Administrator!"
+#        If (!($psISE)){"Press any key to continue…";[void][System.Console]::ReadKey($true)}
+#        Exit 1
+#    }
 
-Write-Host "Capture current free disk space on Drive C" -foreground yellow
+Write-Host "Capturing current free disk space on Drive C" -foreground yellow
     $FreespaceBefore = (Get-WmiObject win32_logicaldisk -filter "DeviceID='C:'" | select Freespace).FreeSpace/1GB
 
 Write-host "Deleting Rouge folders" -foreground yellow
