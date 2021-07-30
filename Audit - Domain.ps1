@@ -222,4 +222,4 @@ $adminsnice
 $Users
 <br>
 "@
-$HTMLFile | out-file C:\Temp\Domain-Audit.html
+$HTMLFile | out-file C:\Automation\Audit-Domain.html
