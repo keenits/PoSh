@@ -21,7 +21,7 @@ td, th { border:0px solid black;
         border-collapse:collapse;
         white-space:pre; }
 th { color:white;
-    background-color:black; }
+    background-color:green; }
 table, tr, td, th {
      padding: 2px; 
      margin: 0px;
@@ -64,4 +64,4 @@ $ScopeInfo = foreach ($Scope in $scopes) {
 $DHCPServerStats = Get-DhcpServerv4Statistics | Select-Object InUse,Available,Acks,AddressesAvailable,AddressesInUse,Declines,DelayedOffers,Discovers,Naks,Offers,PendingOffers,PercentageAvailable,PercentageInUse,PercentagePendingOffers,Releases,Requests,ScopesWithDelayConfigured,ServerStartTime,TotalAddresses,TotalScope | ConvertTo-Html -Fragment -PreContent "<h1>DHCP Server statistics</h1>" -As List | Out-String
  
  
-$head, $DCHPServerSettings, $databaseinfo, $DHCPDCAuth, $ScopesAvailable,$ScopeInfo,$DHCPServerStats | out-file "C:\Temp\DHCP-Autdit.html"
+$head, $DCHPServerSettings, $databaseinfo, $DHCPDCAuth, $ScopesAvailable,$ScopeInfo,$DHCPServerStats | out-file "C:\Automation\Sudit-DHCP.html"
